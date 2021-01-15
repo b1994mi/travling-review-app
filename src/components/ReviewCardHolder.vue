@@ -10,6 +10,7 @@
         :date-created="review.created_at"
         :stars="review.review_star"
         :images="review.image"
+        @suksesHapus="hapusDariArr"
       />
     </div>
     <div v-else class="d-flex justify-content-center">
@@ -40,5 +41,10 @@ export default {
   components: {
     ReviewCard,
   },
+  methods: {
+    hapusDariArr(id) {
+      this.reviews = this.reviews.filter(el => el._id != id)
+    }
+  }
 };
 </script>

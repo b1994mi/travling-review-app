@@ -69,26 +69,30 @@ import StarsHollow from "./StarsHollow";
 import ThreeDots from "./ThreeDots";
 export default {
   props: ["id", "comment", "name", "dateCreated", "stars", "images"],
+  emits: ["suksesHapus"],
   methods: {
     ubahTanggal(tgl) {
       let tglBaru = new Date(tgl);
       let tanggal = tglBaru.getDate();
       let bulan = tglBaru.toLocaleString("id-id", { month: "long" });
       let tahun = tglBaru.getFullYear();
-      let pukul = tglBaru.toTimeString().substr(0,5)
+      let pukul = tglBaru.toTimeString().substr(0, 5);
       let kembalikan = `${tanggal} ${bulan} ${tahun}, ${pukul}`;
       return kembalikan;
     },
     tambahBase64(b64) {
       return `data:image/jpeg;base64,${b64}`;
     },
-    hapusReview() {
+    hapusReview(event) {
+      let details = event.target.parentElement.parentElement;
       fetch(`https://review-backend.herokuapp.com/api/v1/review/${this.id}`, {
         method: "delete",
       })
         .then((res) => res.json())
         .then((data) => {
           console.log(data);
+          details.open = false;
+          this.$emit("suksesHapus", this.id);
         });
     },
   },
@@ -125,5 +129,21 @@ export default {
 
 .dropdown div a {
   width: 100%;
+}
+
+/* Close the dropdown with outside clicks */
+.dropdown > summary::before {
+  display: none;
+}
+
+.dropdown[open] > summary::before {
+  content: " ";
+  display: block;
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 1;
 }
 </style>
