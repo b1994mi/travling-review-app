@@ -8,6 +8,7 @@
       <h1>Review</h1>
       <div class="d-flex flex-grow-1 justify-content-end">
         <rating
+        :key="ratingKey"
           :grade="0"
           :maxStars="5"
           :hasCounter="false"
@@ -22,6 +23,7 @@
         type="text"
         placeholder="Nama Lengkap"
         required
+        :disabled="isLoading"
         v-model="nama"
       />
       <label for="nama-pengulas">Nama Lengkap</label>
@@ -34,6 +36,7 @@
         form="form-utama"
         placeholder="Tulis Review Terbaikmu"
         required
+        :disabled="isLoading"
         v-model="review"
       />
       <label for="isi-ulasan">Tulis Review Terbaikmu</label>
@@ -54,6 +57,8 @@ export default {
       nama: "",
       review: "",
       bintang: "",
+      isLoading: false,
+      ratingKey: false,
     };
   },
   methods: {
@@ -66,13 +71,24 @@ export default {
       unggahan.files.forEach((item) => {
         formdata.append("images", item, item.name);
       });
+      this.isLoading = true;
       fetch("https://review-backend.herokuapp.com/api/v1/review/", {
         method: "POST",
         body: formdata,
       })
         .then((response) => response.text())
-        .then((result) => console.log(result))
-        .catch((error) => console.log("error", error));
+        .then((result) => {
+          console.log(result);
+          this.isLoading = false;
+          this.nama = ""
+          this.review = ""
+          this.bintang = ""
+          this.ratingKey = !this.ratingKey
+        })
+        .catch((error) => {
+          window.alert(error);
+          this.isLoading = false;
+        });
     },
     getStars(s) {
       this.bintang = s;
