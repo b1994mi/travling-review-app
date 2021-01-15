@@ -41,7 +41,15 @@
     </div>
     <div class="d-flex justify-content-evenly flex-wrap">
       <div class="flex-shrink-1 mb-2 mb-sm-0">
-      <input type="file" nama="images" id="unggah-file" class="form-control" multiple />
+        <input
+          type="file"
+          nama="images"
+          id="unggah-file"
+          ref="myFileInput"
+          class="form-control"
+          multiple
+          :disabled="isLoading"
+        />
       </div>
       <input type="submit" value="Kirim" class="btn btn-primary mb-2 mb-sm-0" />
     </div>
@@ -61,7 +69,7 @@ export default {
       keyRating: false,
     };
   },
-  emits: ['suksesTambah'],
+  emits: ["suksesTambah"],
   methods: {
     handleSubmit(event) {
       if (!this.nama || !this.review || !this.bintang) {
@@ -91,11 +99,12 @@ export default {
           .then((response) => response.text())
           .then((result) => {
             console.log(result);
-            this.$emit('suksesTambah')
+            this.$emit("suksesTambah");
             this.isLoading = false;
             this.nama = "";
             this.review = "";
             this.bintang = "";
+            this.$refs.myFileInput.value = "";
             this.keyRating = !this.keyRating;
           })
           .catch((error) => {
