@@ -2,7 +2,7 @@
   <form
     @submit.prevent="handleSubmit"
     id="form-utama"
-    class="d-flex flex-column p-3"
+    class="d-flex flex-column px-3 pt-2 pb-3 border-bottom"
   >
     <div class="d-flex flex-wrap mb-3">
       <h1 style="font-size: 3em">Review</h1>
@@ -40,7 +40,7 @@
       <label for="isi-ulasan">Tulis Review Terbaikmu</label>
     </div>
     <div class="d-flex justify-content-evenly flex-wrap">
-      <div class="flex-shrink-1 mb-2 mb-sm-0">
+      <div class="flex-shrink-1 mb-3 mb-sm-0" style="flex-basis:480px">
         <input
           type="file"
           nama="images"
@@ -51,10 +51,9 @@
           :disabled="isLoading"
         />
       </div>
-      <input type="submit" value="Kirim" class="btn btn-primary mb-2 mb-sm-0" />
+      <input type="submit" value="Kirim" class="btn btn-primary" />
     </div>
   </form>
-  <p>nama: {{ nama }} dgn review: {{ review }} dan bintang {{ bintang }}</p>
 </template>
 
 <script>
@@ -71,6 +70,9 @@ export default {
   },
   emits: ["suksesTambah"],
   methods: {
+    getStars(s) {
+      this.bintang = s;
+    },
     handleSubmit(event) {
       if (!this.nama || !this.review || !this.bintang) {
         if (!this.nama) {
@@ -96,10 +98,9 @@ export default {
           method: "POST",
           body: formdata,
         })
-          .then((response) => response.text())
+          .then((response) => response.json())
           .then((result) => {
-            console.log(result);
-            this.$emit("suksesTambah");
+            this.$emit("suksesTambah", result);
             this.isLoading = false;
             this.nama = "";
             this.review = "";
@@ -112,9 +113,6 @@ export default {
             this.isLoading = false;
           });
       }
-    },
-    getStars(s) {
-      this.bintang = s;
     },
   },
   components: {

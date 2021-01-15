@@ -38,7 +38,7 @@
             </div>
           </div>
           <div class="d-flex flex-column">
-            <p class="isi-review m-0 mb-1 text-break">{{ id }} {{ comment }}</p>
+            <p class="isi-review m-0 mb-1 text-break">{{ comment }}</p>
             <div class="d-flex">
               <div class="d-flex flex-wrap">
                 <div
@@ -82,16 +82,22 @@ export default {
       return `data:image/jpeg;base64,${b64}`;
     },
     hapusReview(event) {
-      let details = event.target.parentElement.parentElement;
-      fetch(`https://review-backend.herokuapp.com/api/v1/review/${this.id}`, {
-        method: "delete",
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          console.log(data);
-          details.open = false;
-          this.$emit("suksesHapus", this.id);
-        });
+      let r = confirm("Yakin mau hapus?");
+      if (r) {
+        let details = event.target.parentElement.parentElement;
+        fetch(`https://review-backend.herokuapp.com/api/v1/review/${this.id}`, {
+          method: "delete",
+        })
+          .then((response) => response.json())
+          .then((result) => {
+            details.open = false;
+            this.$emit("suksesHapus", result);
+          })
+          .catch((error) => {
+            window.alert(error);
+            this.isLoading = false;
+          });
+      }
     },
   },
   components: {
@@ -141,7 +147,7 @@ export default {
   }
 }
 
-/* Dropdown styles */
+/* Dropdown without CSS by garetmckinley from Codepen */
 .dropdown {
   position: relative;
 }
