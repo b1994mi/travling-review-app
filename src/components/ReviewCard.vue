@@ -1,14 +1,13 @@
 <template>
-  <div class="card mb-2 rounded shadow-sm">
+  <div class="card mb-2 rounded shadow-sm card-text-size">
     <div class="card-body bg-light">
       <div class="d-flex flex-grow-1">
         <div class="d-flex flex-column">
-          <div class="rounded-circle overflow-hidden me-3">
+          <div class="rounded-circle overflow-hidden me-3 avatar-size">
             <img
               src="https://socialmedia4us.files.wordpress.com/2015/11/twitter-egg-icon.jpg"
               alt="image"
-              width="50"
-              height="50"
+              style="width: 100%; height: 100%"
             />
           </div>
         </div>
@@ -39,15 +38,14 @@
             </div>
           </div>
           <div class="d-flex flex-column">
-            <p class="isi-review m-0 mb-1">{{ id }} {{ comment }}</p>
+            <p class="isi-review m-0 mb-1 text-break">{{ id }} {{ comment }}</p>
             <div class="d-flex">
-              <div
-                class="overflow-hidden me-3 rounded d-flex align-items-center"
-                style="width: 150px; height: 150px"
-                v-for="image in images"
-                :key="image"
-              >
-                <div>
+              <div class="d-flex flex-wrap">
+                <div
+                  class="overflow-hidden me-3 rounded d-flex align-items-center image-size"
+                  v-for="image in images"
+                  :key="image"
+                >
                   <img
                     class="w-100"
                     :src="tambahBase64(image.b64)"
@@ -105,6 +103,44 @@ export default {
 </script>
 
 <style>
+.avatar-size {
+  width: 30px;
+  height: 30px;
+}
+
+.image-size {
+  width: 60px;
+  height: 60px;
+}
+
+@media (min-width: 310px) {
+  .avatar-size {
+    width: 40px;
+    height: 40px;
+  }
+  .image-size {
+    width: 80px;
+    height: 80px;
+  }
+}
+
+@media (min-width: 576px) {
+  .avatar-size {
+    width: 60px;
+    height: 60px;
+  }
+  .image-size {
+    width: 150px;
+    height: 150px;
+  }
+}
+
+@media (max-width: 576px) {
+  .card-text-size {
+    font-size: 0.9rem;
+  }
+}
+
 /* Dropdown styles */
 .dropdown {
   position: relative;
