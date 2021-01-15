@@ -4,7 +4,7 @@
     id="form-utama"
     class="d-flex flex-column p-3"
   >
-    <div class="d-flex">
+    <div class="d-flex flex-wrap mb-3">
       <h1 style="font-size: 3em">Review</h1>
       <div class="d-flex flex-grow-1 justify-content-end">
         <rating
@@ -40,8 +40,10 @@
       <label for="isi-ulasan">Tulis Review Terbaikmu</label>
     </div>
     <div class="d-flex justify-content-evenly flex-wrap">
-      <input type="file" nama="images" id="unggah-file" multiple />
-      <input type="submit" value="Kirim" />
+      <div class="flex-shrink-1 mb-2 mb-sm-0">
+      <input type="file" nama="images" id="unggah-file" class="form-control" multiple />
+      </div>
+      <input type="submit" value="Kirim" class="btn btn-primary mb-2 mb-sm-0" />
     </div>
   </form>
   <p>nama: {{ nama }} dgn review: {{ review }} dan bintang {{ bintang }}</p>
