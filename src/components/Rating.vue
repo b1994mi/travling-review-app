@@ -1,6 +1,6 @@
 // Rating component by ramazanerikli
 <template>
-  <ul class="d-flex">
+  <div class="d-flex m-0 align-items-center">
     <div
       @click="rate(star)"
       v-for="star in maxStars"
@@ -15,7 +15,7 @@
         <stars-hollow :height="32" :width="32" />
       </div>
     </div>
-  </ul>
+  </div>
   <div v-if="hasCounter" class="info counter">
     <span class="score-rating">{{ stars }}</span>
     <span class="divider">/</span>

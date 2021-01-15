@@ -5,10 +5,10 @@
     class="d-flex flex-column p-3"
   >
     <div class="d-flex">
-      <h1>Review</h1>
+      <h1 style="font-size: 3em">Review</h1>
       <div class="d-flex flex-grow-1 justify-content-end">
         <rating
-        :key="ratingKey"
+          :key="keyRating"
           :grade="0"
           :maxStars="5"
           :hasCounter="false"
@@ -22,7 +22,6 @@
         class="form-control"
         type="text"
         placeholder="Nama Lengkap"
-        required
         :disabled="isLoading"
         v-model="nama"
       />
@@ -32,10 +31,9 @@
       <textarea
         id="isi-ulasan"
         class="mb-3 form-control"
-        style="height:6rem"
+        style="height: 7rem"
         form="form-utama"
         placeholder="Tulis Review Terbaikmu"
-        required
         :disabled="isLoading"
         v-model="review"
       />
@@ -58,37 +56,51 @@ export default {
       review: "",
       bintang: "",
       isLoading: false,
-      ratingKey: false,
+      keyRating: false,
     };
   },
+  emits: ['suksesTambah'],
   methods: {
     handleSubmit(event) {
-      let formdata = new FormData();
-      let unggahan = event.target.querySelector("#unggah-file");
-      formdata.append("name", this.nama);
-      formdata.append("review_comment", this.review);
-      formdata.append("review_star", this.bintang);
-      unggahan.files.forEach((item) => {
-        formdata.append("images", item, item.name);
-      });
-      this.isLoading = true;
-      fetch("https://review-backend.herokuapp.com/api/v1/review/", {
-        method: "POST",
-        body: formdata,
-      })
-        .then((response) => response.text())
-        .then((result) => {
-          console.log(result);
-          this.isLoading = false;
-          this.nama = ""
-          this.review = ""
-          this.bintang = ""
-          this.ratingKey = !this.ratingKey
-        })
-        .catch((error) => {
-          window.alert(error);
-          this.isLoading = false;
+      if (!this.nama || !this.review || !this.bintang) {
+        if (!this.nama) {
+          window.alert("mohon lengkapi nama!");
+        }
+        if (!this.review) {
+          window.alert("mohon lengkapi isi ulasan Anda!");
+        }
+        if (!this.bintang) {
+          window.alert("mohon lengkapi rating bintang Anda!");
+        }
+      } else {
+        let formdata = new FormData();
+        let unggahan = event.target.querySelector("#unggah-file");
+        formdata.append("name", this.nama);
+        formdata.append("review_comment", this.review);
+        formdata.append("review_star", this.bintang);
+        unggahan.files.forEach((item) => {
+          formdata.append("images", item, item.name);
         });
+        this.isLoading = true;
+        fetch("https://review-backend.herokuapp.com/api/v1/review/", {
+          method: "POST",
+          body: formdata,
+        })
+          .then((response) => response.text())
+          .then((result) => {
+            console.log(result);
+            this.$emit('suksesTambah')
+            this.isLoading = false;
+            this.nama = "";
+            this.review = "";
+            this.bintang = "";
+            this.keyRating = !this.keyRating;
+          })
+          .catch((error) => {
+            window.alert(error);
+            this.isLoading = false;
+          });
+      }
     },
     getStars(s) {
       this.bintang = s;
