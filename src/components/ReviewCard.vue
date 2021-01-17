@@ -1,59 +1,41 @@
 <template>
-  <div class="card mb-2 rounded shadow-sm card-text-size">
-    <div class="card-body bg-light">
-      <div class="d-flex flex-grow-1">
+  <div class="card flex-row bg-light mb-2 p-3 rounded shadow-sm card-text-size">
+    <display-pic :picURL="picURL" :picName="picName" />
+    <div class="d-flex flex-wrap w-100">
+      <div class="d-flex w-100">
         <div class="d-flex flex-column">
-          <div class="rounded-circle overflow-hidden me-3 avatar-size">
-            <img
-              src="https://socialmedia4us.files.wordpress.com/2015/11/twitter-egg-icon.jpg"
-              alt="image"
-              style="width: 100%; height: 100%"
-            />
-          </div>
+          <p class="fw-bold m-0">{{ name }}</p>
+          <p class="fw-light m-0">{{ formatTgl(dateCreated) }}</p>
+          <p class="m-0 mb-1">
+            <stars-filled v-for="n in stars" :key="n" />
+            <stars-hollow v-for="n in 5 - stars" :key="n" />
+          </p>
         </div>
-        <div class="d-flex flex-wrap w-100">
-          <div class="d-flex w-100">
-            <div class="d-flex flex-column">
-              <p class="fw-bold m-0">{{ name }}</p>
-              <p class="fw-light m-0">{{ ubahTanggal(dateCreated) }}</p>
-              <p class="m-0 mb-1">
-                <stars-filled v-for="n in stars" :key="n" />
-                <stars-hollow v-for="n in 5 - stars" :key="n" />
-              </p>
+        <div class="d-flex flex-grow-1 justify-content-end">
+          <details class="dropdown">
+            <summary role="button">
+              <a class="button">
+                <three-dots />
+              </a>
+            </summary>
+            <div>
+              <a @click="ubahReview" class="btn btn-warning p-1">Edit review</a>
+              <a @click="hapusReview" class="btn btn-danger p-1"
+                >Delete review</a
+              >
             </div>
-            <div class="d-flex flex-grow-1 justify-content-end">
-              <details class="dropdown">
-                <summary role="button">
-                  <a class="button">
-                    <three-dots />
-                  </a>
-                </summary>
-                <div>
-                  <a class="btn btn-warning p-1">Edit review</a>
-                  <a @click="hapusReview" class="btn btn-danger p-1"
-                    >Delete review</a
-                  >
-                </div>
-              </details>
-            </div>
-          </div>
-          <div class="d-flex flex-column">
-            <p class="isi-review m-0 mb-1 text-break">{{ comment }}</p>
-            <div class="d-flex">
-              <div class="d-flex flex-wrap">
-                <div
-                  class="overflow-hidden me-3 rounded d-flex align-items-center image-size"
-                  v-for="image in images"
-                  :key="image"
-                >
-                  <img
-                    class="w-100"
-                    :src="tambahBase64(image.b64)"
-                    :alt="image.originalName"
-                  />
-                </div>
-              </div>
-            </div>
+          </details>
+        </div>
+      </div>
+      <div class="d-flex flex-column">
+        <p class="isi-review m-0 mb-1 text-break">{{ comment }}</p>
+        <div class="d-flex flex-wrap">
+          <div
+            class="overflow-hidden me-3 rounded d-flex align-items-center image-size"
+            v-for="image in images"
+            :key="image"
+          >
+            <img class="w-100" :src="'data:image/jpeg;base64,' + image.b64" />
           </div>
         </div>
       </div>
@@ -62,24 +44,30 @@
 </template>
 
 <script>
+import DisplayPic from "./DisplayPic.vue";
 import StarsFilled from "./StarsFilled";
 import StarsHollow from "./StarsHollow";
 import ThreeDots from "./ThreeDots";
 export default {
+  data() {
+    return {
+      picURL:
+        "https://abs.twimg.com/sticky/default_profile_images/default_profile_400x400.png", // Suatu saat ini bisa diganti prop
+      picName: "twitter-egg-icon.jpg",
+    };
+  },
   props: ["id", "comment", "name", "dateCreated", "stars", "images"],
   emits: ["suksesHapus"],
   methods: {
-    ubahTanggal(tgl) {
-      let tglBaru = new Date(tgl);
-      let tanggal = tglBaru.getDate();
-      let bulan = tglBaru.toLocaleString("id-id", { month: "long" });
-      let tahun = tglBaru.getFullYear();
-      let pukul = tglBaru.toTimeString().substr(0, 5);
-      let kembalikan = `${tanggal} ${bulan} ${tahun}, ${pukul}`;
-      return kembalikan;
-    },
-    tambahBase64(b64) {
-      return `data:image/jpeg;base64,${b64}`;
+    formatTgl(tgl) {
+      return new Date(tgl).toLocaleDateString("id-id", {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
     },
     hapusReview(event) {
       let r = confirm("Yakin mau hapus?");
@@ -104,26 +92,18 @@ export default {
     StarsFilled,
     StarsHollow,
     ThreeDots,
+    DisplayPic,
   },
 };
 </script>
 
 <style>
-.avatar-size {
-  width: 30px;
-  height: 30px;
-}
-
 .image-size {
   width: 60px;
   height: 60px;
 }
 
 @media (min-width: 310px) {
-  .avatar-size {
-    width: 40px;
-    height: 40px;
-  }
   .image-size {
     width: 80px;
     height: 80px;
@@ -131,10 +111,6 @@ export default {
 }
 
 @media (min-width: 576px) {
-  .avatar-size {
-    width: 60px;
-    height: 60px;
-  }
   .image-size {
     width: 150px;
     height: 150px;
