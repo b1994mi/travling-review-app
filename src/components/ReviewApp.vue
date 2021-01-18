@@ -26,6 +26,7 @@
         :comment="review.review_comment"
         :name="review.name"
         :date-created="review.created_at"
+        :updated-at="review.updated_at"
         :stars="review.review_star"
         :images="review.image"
         @suksesHapus="removeReviewFromArr"

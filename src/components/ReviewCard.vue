@@ -29,6 +29,7 @@
           </div>
           <p v-else class="fw-bold m-0">{{ name_toBeShown }}</p>
           <p class="fw-light m-0">{{ formatTgl(dateCreated) }}</p>
+          <p v-if="dateCreated !== updatedAt" class="fw-light m-0">Edited: {{ formatTgl(updatedAt) }}</p>
           <rating
             :grade="stars_toBeEdited"
             :maxStars="5"
@@ -106,7 +107,7 @@ export default {
       picName: "twitter-egg-icon.jpg",
     };
   },
-  props: ["id", "comment", "name", "dateCreated", "stars", "images"],
+  props: ["id", "comment", "name", "dateCreated", "updatedAt", "stars", "images"],
   emits: ["suksesHapus"],
   methods: {
     formatTgl(tgl) {
