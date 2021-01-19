@@ -29,7 +29,9 @@
           </div>
           <p v-else class="fw-bold m-0">{{ name_toBeShown }}</p>
           <p class="fw-light m-0">{{ formatTgl(dateCreated) }}</p>
-          <p v-if="dateCreated !== updatedAt" class="fw-light m-0">Edited: {{ formatTgl(updatedAt) }}</p>
+          <p v-if="dateCreated !== updatedAt" class="fw-light m-0">
+            Edited: {{ formatTgl(updatedAt) }}
+          </p>
           <rating
             :grade="stars_toBeEdited"
             :maxStars="5"
@@ -62,19 +64,21 @@
           </div>
         </details>
       </div>
-      <textarea
-        v-if="isEditMode"
-        v-model="comment_toBeEdited"
-        class="form-control my-2 align-self-stretch"
-        style="font-size: inherit !important; min-height: 8em"
-        :disabled="isLoading"
-      ></textarea>
+      <div v-if="isEditMode">
+        <textarea
+          v-model="comment_toBeEdited"
+          class="form-control my-2 align-self-stretch"
+          style="font-size: inherit !important; min-height: 8em"
+          :disabled="isLoading"
+        ></textarea>
+        <image-input :images="images_toBeEdited" @listImgChanges="setImgs" />
+      </div>
       <div v-else class="d-flex flex-column">
         <p class="isi-review m-0 mb-1 text-break">{{ comment_toBeShown }}</p>
         <div v-if="images.length > 0" class="d-flex flex-wrap">
           <div
             class="overflow-hidden me-3 rounded d-flex align-items-center image-size"
-            v-for="image in images"
+            v-for="image in images_toBeShown"
             :key="image"
           >
             <img class="w-100" :src="'data:image/jpeg;base64,' + image.b64" />
@@ -86,12 +90,31 @@
 </template>
 
 <script>
-import DisplayPic from "./DisplayPic.vue";
+import DisplayPic from "./DisplayPic";
+import ImageInput from "./ImageInput";
 import Rating from "./Rating";
 import StarsFilled from "./StarsFilled";
 import StarsHollow from "./StarsHollow";
 import ThreeDots from "./ThreeDots";
 export default {
+  components: {
+    StarsFilled,
+    StarsHollow,
+    ThreeDots,
+    DisplayPic,
+    Rating,
+    ImageInput,
+  },
+  props: [
+    "id",
+    "comment",
+    "name",
+    "dateCreated",
+    "updatedAt",
+    "stars",
+    "images",
+  ],
+  emits: ["suksesHapus"],
   data() {
     return {
       isEditMode: false,
@@ -99,16 +122,16 @@ export default {
       name_toBeShown: this.name,
       comment_toBeShown: this.comment,
       stars_toBeShown: this.stars,
+      images_toBeShown: this.images,
       name_toBeEdited: this.name,
       comment_toBeEdited: this.comment,
       stars_toBeEdited: this.stars,
+      images_toBeEdited: this.imagesToBlobs(this.images),
       picURL:
         "https://abs.twimg.com/sticky/default_profile_images/default_profile_400x400.png", // Suatu saat ini bisa diganti prop
       picName: "twitter-egg-icon.jpg",
     };
   },
-  props: ["id", "comment", "name", "dateCreated", "updatedAt", "stars", "images"],
-  emits: ["suksesHapus"],
   methods: {
     formatTgl(tgl) {
       return new Date(tgl).toLocaleDateString("id-id", {
@@ -148,13 +171,12 @@ export default {
       if (r) {
         this.isLoading = true;
         let formdata = new FormData();
-        // let unggahan = event.target.querySelector("#unggah-file");
         formdata.append("name", this.name_toBeEdited);
         formdata.append("review_comment", this.comment_toBeEdited);
         formdata.append("review_star", this.stars_toBeEdited);
-        // unggahan.files.forEach((item) => {
-        //   formdata.append("images", item, item.name);
-        // });
+        this.images_toBeEdited.forEach((item) => {
+          formdata.append("images", item, item.name);
+        });
         fetch(`https://review-backend.herokuapp.com/api/v1/review/${this.id}`, {
           method: "PATCH",
           body: formdata,
@@ -166,6 +188,7 @@ export default {
             this.name_toBeShown = this.name_toBeEdited;
             this.comment_toBeShown = this.comment_toBeEdited;
             this.stars_toBeShown = this.stars_toBeEdited;
+            this.images_toBeShown = this.images_toBeEdited;
           })
           .catch((error) => {
             window.alert(error);
@@ -179,13 +202,33 @@ export default {
     setStars(s) {
       this.stars_toBeEdited = s;
     },
-  },
-  components: {
-    StarsFilled,
-    StarsHollow,
-    ThreeDots,
-    DisplayPic,
-    Rating,
+    setImgs(arr) {
+      this.images_toBeEdited = arr;
+    },
+    b64toBlob(b64Data, contentType = "", sliceSize = 512) {
+      let byteCharacters = atob(b64Data);
+      let byteArrays = [];
+      let bcl = byteCharacters.length;
+      for (let offset = 0; offset < bcl; offset += sliceSize) {
+        let slice = byteCharacters.slice(offset, offset + sliceSize);
+        let byteNumbers = new Array(slice.length);
+        for (let i = 0; i < slice.length; i++) {
+          byteNumbers[i] = slice.charCodeAt(i);
+        }
+        let byteArray = new Uint8Array(byteNumbers);
+        byteArrays.push(byteArray);
+      }
+      let blob = new Blob(byteArrays, { type: contentType });
+      return blob;
+    },
+    imagesToBlobs(images = []) {
+      return images.map((image) => {
+        let theBlob = this.b64toBlob(image.b64);
+        theBlob.lastModifiedDate = new Date();
+        theBlob.name = image.originalName;
+        return theBlob;
+      });
+    },
   },
 };
 </script>
