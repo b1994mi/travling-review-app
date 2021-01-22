@@ -10,9 +10,13 @@
       multiple
       @change="onFileChange"
     />
-    <div :key="sesuatu">
-      <div v-for="img in images_files" :key="img">
-        <img :src="urlizer(img)" />
+    <div :key="sesuatu" class="d-flex flex-wrap">
+      <div
+        v-for="img in images_files"
+        :key="img"
+        class="overflow-hidden me-3 rounded d-flex align-items-center image-size"
+      >
+        <img :src="urlizer(img)" class="w-100" />
       </div>
     </div>
   </div>
@@ -38,9 +42,11 @@ export default {
     },
     onFileChange(event) {
       this.images_files = [...this.images_files, ...event.target.files];
-      this.$emit("listImgChanges", this.images_files)
+      this.$emit("listImgChanges", this.images_files);
+      console.log(this.images_files)
     },
     urlizer(img) {
+      console.log(img)
       return img instanceof Blob ? URL.createObjectURL(img) : img;
     },
   },

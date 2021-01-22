@@ -81,7 +81,11 @@
             v-for="image in images_toBeShown"
             :key="image"
           >
-            <img class="w-100" :src="'data:image/jpeg;base64,' + image.b64" />
+            <img
+              class="w-100"
+              :src="urlizer(image)"
+              :alt="image.originalName"
+            />
           </div>
         </div>
       </div>
@@ -204,6 +208,11 @@ export default {
     },
     setImgs(arr) {
       this.images_toBeEdited = arr;
+    },
+    urlizer(img) {
+      return img instanceof Blob
+        ? URL.createObjectURL(img)
+        : "data:image/jpeg;base64," + img.b64;
     },
     b64toBlob(b64Data, contentType = "", sliceSize = 512) {
       let byteCharacters = atob(b64Data);
