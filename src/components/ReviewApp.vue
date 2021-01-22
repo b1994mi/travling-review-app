@@ -59,7 +59,7 @@ export default {
   methods: {
     getReviews() {
       this.isLoading = true;
-      fetch("https://review-backend.herokuapp.com/api/v1/review/")
+      fetch("http://localhost:5050/api/v1/review")
         .then((response) => response.json())
         .then((result) => {
           this.reviews = [...result.data.reverse()];
@@ -72,7 +72,7 @@ export default {
     },
     pushReviewToArr(object) {
       fetch(
-        `https://review-backend.herokuapp.com/api/v1/review/${object.data.id}`
+        `http://localhost:5050/api/v1/review/${object.data.id}`
       )
         .then((response) => response.json())
         .then((result) => (this.reviews = [result.data, ...this.reviews]))

@@ -94,7 +94,7 @@ export default {
           formdata.append("images", item, item.name);
         });
         this.isLoading = true;
-        fetch("https://review-backend.herokuapp.com/api/v1/review/", {
+        fetch("http://localhost:5050/api/v1/review", {
           method: "POST",
           body: formdata,
         })

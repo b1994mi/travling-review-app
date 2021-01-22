@@ -147,7 +147,7 @@ export default {
       let r = confirm("Yakin mau hapus?");
       if (r) {
         let details = event.target.parentElement.parentElement;
-        fetch(`https://review-backend.herokuapp.com/api/v1/review/${this.id}`, {
+        fetch(`http://localhost:5050/api/v1/review/${this.id}`, {
           method: "delete",
         })
           .then((response) => response.json())
@@ -177,7 +177,7 @@ export default {
         this.images_toBeEdited.forEach((item) => {
           formdata.append("images", item, item.name);
         });
-        fetch(`https://review-backend.herokuapp.com/api/v1/review/${this.id}`, {
+        fetch(`http://localhost:5050/api/v1/review/${this.id}`, {
           method: "PATCH",
           body: formdata,
         })
