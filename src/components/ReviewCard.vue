@@ -63,16 +63,16 @@
           <button
             @click="batalUbahReview"
             :disabled="isLoading"
-            class="btn btn-secondary btn-responsive ms-sm-2"
+            class="btn btn-primary btn-responsive ms-sm-2"
           >
-            Batal
+            Cancel
           </button>
           <button
             @click="fixUbahReview"
             :disabled="isLoading"
             class="btn btn-outline-danger btn-responsive ms-2"
           >
-            Simpan
+            Save
           </button>
         </image-input>
       </div>
