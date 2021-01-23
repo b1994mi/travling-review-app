@@ -79,7 +79,7 @@
       </div>
       <div v-else class="d-flex flex-column">
         <p class="isi-review m-0 mb-1 text-break">{{ comment_toBeShown }}</p>
-        <div v-if="images.length > 0" class="d-flex flex-wrap">
+        <div v-if="images_toBeShown.length > 0" class="d-flex flex-wrap">
           <div
             class="overflow-hidden mt-2 me-3 rounded-3 d-flex align-items-center image-size"
             v-for="image in images_toBeShown"

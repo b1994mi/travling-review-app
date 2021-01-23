@@ -85,6 +85,7 @@ export default {
     },
     deleteImage(img) {
       this.images_files = this.images_files.filter((item) => item != img);
+      this.$emit("listImgChanges", this.images_files);
     },
   },
 };
