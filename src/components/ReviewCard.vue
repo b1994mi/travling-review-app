@@ -12,22 +12,6 @@
               v-model="name_toBeEdited"
               :disabled="isLoading"
             />
-            <div class="flex-shrink my-2 my-sm-0">
-              <button
-                @click="batalUbahReview"
-                :disabled="isLoading"
-                class="btn btn-secondary btn-responsive ms-sm-2"
-              >
-                Batal
-              </button>
-              <button
-                @click="fixUbahReview"
-                :disabled="isLoading"
-                class="btn btn-outline-danger btn-responsive ms-2"
-              >
-                Simpan
-              </button>
-            </div>
           </div>
           <p v-else class="fw-bold m-0">{{ name_toBeShown }}</p>
           <p class="fw-light m-0">{{ formatTgl(dateCreated) }}</p>
@@ -75,7 +59,22 @@
           placeholder="Your review here..."
           :disabled="isLoading"
         ></textarea>
-        <image-input :images="images_toBeEdited" @listImgChanges="setImgs" />
+        <image-input :images="images_toBeEdited" @listImgChanges="setImgs">
+          <button
+            @click="batalUbahReview"
+            :disabled="isLoading"
+            class="btn btn-secondary btn-responsive ms-sm-2"
+          >
+            Batal
+          </button>
+          <button
+            @click="fixUbahReview"
+            :disabled="isLoading"
+            class="btn btn-outline-danger btn-responsive ms-2"
+          >
+            Simpan
+          </button>
+        </image-input>
       </div>
       <div v-else class="d-flex flex-column">
         <p class="isi-review m-0 mb-1 text-break">{{ comment_toBeShown }}</p>

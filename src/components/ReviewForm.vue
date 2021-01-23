@@ -1,9 +1,5 @@
 <template>
-  <form
-    @submit.prevent="handleSubmit"
-    id="form-utama"
-    class="d-flex flex-column px-3 pt-2 pb-3 border-bottom"
-  >
+  <div id="form-utama" class="d-flex flex-column px-3 pt-2 pb-3 border-bottom">
     <div class="d-flex flex-wrap mb-3">
       <h1 style="font-size: 3em">Review</h1>
       <div class="d-flex flex-grow-1 justify-content-end">
@@ -16,7 +12,7 @@
         />
       </div>
     </div>
-    <div class="form-floating mb-3">
+    <div class="form-floating mb-3 card-text-size">
       <input
         id="nama-pengulas"
         class="form-control"
@@ -27,7 +23,7 @@
       />
       <label for="nama-pengulas">Nama Lengkap</label>
     </div>
-    <div class="form-floating">
+    <div class="form-floating card-text-size">
       <textarea
         id="isi-ulasan"
         class="mb-3 form-control"
@@ -39,24 +35,34 @@
       />
       <label for="isi-ulasan">Tulis Review Terbaikmu</label>
     </div>
-    <div class="d-flex justify-content-evenly flex-wrap">
-      <div class="flex-shrink-1 mb-3 mb-sm-0" style="flex-basis:480px">
-        <input
-          type="file"
-          nama="images"
-          id="unggah-file"
-          ref="myFileInput"
-          class="form-control"
-          multiple
-          :disabled="isLoading"
-        />
-      </div>
-      <input type="submit" value="Kirim" class="btn btn-primary" />
-    </div>
-  </form>
+    <image-input :images="gambar" @listImgChanges="setImgs" :key="keyImgInput">
+      <button
+        class="btn btn-primary btn-responsive d-flex align-items-center"
+        @click="handleSubmit"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          fill="currentColor"
+          class="bi bi-upload"
+          viewBox="0 0 16 16"
+        >
+          <path
+            d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"
+          />
+          <path
+            d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z"
+          />
+        </svg>
+        <span class="ms-2">Kirim</span>
+      </button>
+    </image-input>
+  </div>
 </template>
 
 <script>
+import ImageInput from "./ImageInput";
 /*
 
 Todo: 
@@ -72,14 +78,19 @@ export default {
       nama: "",
       review: "",
       bintang: "",
+      gambar: [],
       isLoading: false,
       keyRating: false,
+      keyImgInput: false,
     };
   },
   emits: ["suksesTambah"],
   methods: {
     getStars(s) {
       this.bintang = s;
+    },
+    setImgs(arr) {
+      this.gambar = arr;
     },
     handleSubmit(event) {
       if (!this.nama || !this.review || !this.bintang) {
@@ -94,11 +105,10 @@ export default {
         }
       } else {
         let formdata = new FormData();
-        let unggahan = event.target.querySelector("#unggah-file");
         formdata.append("name", this.nama);
         formdata.append("review_comment", this.review);
         formdata.append("review_star", this.bintang);
-        unggahan.files.forEach((item) => {
+        this.gambar.forEach((item) => {
           formdata.append("images", item, item.name);
         });
         this.isLoading = true;
@@ -113,8 +123,9 @@ export default {
             this.nama = "";
             this.review = "";
             this.bintang = "";
-            this.$refs.myFileInput.value = "";
+            this.gambar = [];
             this.keyRating = !this.keyRating;
+            this.keyImgInput = !this.keyImgInput;
           })
           .catch((error) => {
             window.alert(error);
@@ -125,6 +136,7 @@ export default {
   },
   components: {
     Rating,
+    ImageInput,
   },
 };
 </script>

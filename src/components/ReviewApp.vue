@@ -6,8 +6,9 @@
   <div
     :class="[isLoading ? 'd-none' : 'd-flex', 'mt-3 justify-content-center']"
   >
-    <button @click="getReviews" class="btn btn-primary">
-      <refresh-icon /> Refresh
+    <button @click="getReviews" class="btn btn-outline-primary btn-responsive d-flex align-items-center">
+      <refresh-icon />
+      <span class="ms-2">Refresh</span>
     </button>
   </div>
 
