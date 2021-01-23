@@ -57,6 +57,14 @@
 </template>
 
 <script>
+/*
+
+Todo: 
+5. Review form pake komponen image selector juga
+6. Review form juga pake card-text-size spy kecil pas mobile
+7. buttonnya juga btn-responsive
+
+*/
 import Rating from "./Rating";
 export default {
   data() {

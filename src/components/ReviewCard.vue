@@ -3,42 +3,45 @@
     <display-pic :picURL="picURL" :picName="picName" />
     <div class="d-flex flex-wrap w-100">
       <div class="d-flex justify-content-between w-100">
-        <div class="d-flex flex-column">
+        <div class="d-flex flex-column w-100">
           <div v-if="isEditMode" class="d-flex flex-wrap">
             <input
               type="text"
+              class="flex-grow-1"
               placeholder="Your Name..."
-              class="mt-2 mb-2 mt-sm-0 mb-sm-0"
               v-model="name_toBeEdited"
               :disabled="isLoading"
             />
-            <button
-              @click="batalUbahReview"
-              :disabled="isLoading"
-              class="btn btn-secondary mt-2 mb-2 mt-sm-0 mb-sm-0 ms-3"
-            >
-              Batal
-            </button>
-            <button
-              @click="fixUbahReview"
-              :disabled="isLoading"
-              class="btn btn-outline-danger ms-3 mt-2 mb-2 mt-sm-0 mb-sm-0"
-            >
-              Simpan
-            </button>
+            <div class="flex-shrink my-2 my-sm-0">
+              <button
+                @click="batalUbahReview"
+                :disabled="isLoading"
+                class="btn btn-secondary btn-responsive ms-sm-2"
+              >
+                Batal
+              </button>
+              <button
+                @click="fixUbahReview"
+                :disabled="isLoading"
+                class="btn btn-outline-danger btn-responsive ms-2"
+              >
+                Simpan
+              </button>
+            </div>
           </div>
           <p v-else class="fw-bold m-0">{{ name_toBeShown }}</p>
           <p class="fw-light m-0">{{ formatTgl(dateCreated) }}</p>
           <p v-if="dateCreated !== updatedAt" class="fw-light m-0">
             Edited: {{ formatTgl(updatedAt) }}
           </p>
-          <rating
-            :grade="stars_toBeEdited"
-            :maxStars="5"
-            :hasCounter="false"
-            @update="setStars"
-            v-if="isEditMode"
-          />
+          <div v-if="isEditMode" class="my-2">
+            <rating
+              :grade="stars_toBeEdited"
+              :maxStars="5"
+              :hasCounter="false"
+              @update="setStars"
+            />
+          </div>
           <p v-else class="m-0 mb-1">
             <stars-filled v-for="n in stars_toBeShown" :key="n" />
             <stars-hollow v-for="n in 5 - stars_toBeShown" :key="n" />
@@ -64,11 +67,12 @@
           </div>
         </details>
       </div>
-      <div v-if="isEditMode">
+      <div v-if="isEditMode" class="w-100">
         <textarea
           v-model="comment_toBeEdited"
           class="form-control my-2 align-self-stretch"
           style="font-size: inherit !important; min-height: 8em"
+          placeholder="Your review here..."
           :disabled="isLoading"
         ></textarea>
         <image-input :images="images_toBeEdited" @listImgChanges="setImgs" />
@@ -77,7 +81,7 @@
         <p class="isi-review m-0 mb-1 text-break">{{ comment_toBeShown }}</p>
         <div v-if="images.length > 0" class="d-flex flex-wrap">
           <div
-            class="overflow-hidden me-3 rounded d-flex align-items-center image-size"
+            class="overflow-hidden mt-2 me-3 rounded-3 d-flex align-items-center image-size"
             v-for="image in images_toBeShown"
             :key="image"
           >
@@ -171,6 +175,15 @@ export default {
       this.isEditMode = true;
     },
     fixUbahReview() {
+      if (!this.name_toBeEdited) {
+        return alert("Mohon isi nama Anda.");
+      }
+      if (!this.comment_toBeEdited) {
+        return alert("Mohon isi ulasan Anda.");
+      }
+      if (!this.stars_toBeEdited) {
+        return alert("Mohon isi jumlah bintang Anda.");
+      }
       let r = confirm("Yakin mau simpan perubahan?");
       if (r) {
         this.isLoading = true;
@@ -265,6 +278,11 @@ export default {
 @media (max-width: 576px) {
   .card-text-size {
     font-size: 0.9rem;
+  }
+  .btn-responsive {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+    border-radius: 0.2rem;
   }
 }
 
