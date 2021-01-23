@@ -15,8 +15,8 @@
           </div>
           <p v-else class="fw-bold m-0">{{ name_toBeShown }}</p>
           <p class="fw-light m-0">{{ formatTgl(dateCreated) }}</p>
-          <p v-if="dateCreated !== updatedAt" class="fw-light m-0">
-            Edited: {{ formatTgl(updatedAt) }}
+          <p v-if="dateCreated !== updatedAt_toBeShown" class="fw-light m-0">
+            Edited: {{ formatTgl(updatedAt_toBeShown) }}
           </p>
           <div v-if="isEditMode" class="my-2">
             <rating
@@ -130,6 +130,7 @@ export default {
       comment_toBeShown: this.comment,
       stars_toBeShown: this.stars,
       images_toBeShown: this.images,
+      updatedAt_toBeShown: this.updatedAt,
       name_toBeEdited: this.name,
       comment_toBeEdited: this.comment,
       stars_toBeEdited: this.stars,
@@ -205,6 +206,7 @@ export default {
             this.comment_toBeShown = this.comment_toBeEdited;
             this.stars_toBeShown = this.stars_toBeEdited;
             this.images_toBeShown = this.images_toBeEdited;
+            this.updatedAt_toBeShown = new Date();
           })
           .catch((error) => {
             window.alert(error);
