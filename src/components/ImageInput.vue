@@ -67,6 +67,7 @@ export default {
     };
   },
   props: ["images"],
+  emits: ["listImgChanges"],
   methods: {
     launchFilePicker() {
       this.$refs.file.click();
