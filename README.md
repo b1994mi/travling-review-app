@@ -1,4 +1,4 @@
-# travling-test-src
+# travling-review-app
 
 ## Project setup
 ```
