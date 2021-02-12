@@ -97,6 +97,16 @@
 </template>
 
 <script>
+/**
+ * TODO:
+ * 1. hapus function yang tidak digunakan
+ * 2. potong2 fix ubah review menjadi function2 yang lbh mudah dibaca
+ * 3. buat form data ada pergantian di rating star supaya ada terpicu utk ubah updatedAt
+ * 4. hapusReview() dibuat async aja
+ * 5. deploy pake teknik gh-pages aja
+ * 6. pakai plugin sejenis sweet alert tp lbh ringan
+ * 7. puter if(!r) lempar execption aja spy indentasi berkurang
+ */
 import DisplayPic from "./DisplayPic";
 import ImageInput from "./ImageInput";
 import Rating from "./Rating";
@@ -172,6 +182,7 @@ export default {
       if (!this.comment_toBeEdited) return alert("Mohon isi ulasan Anda.");
       if (!this.stars_toBeEdited) return alert("Isi jumlah bintang Anda.");
       let r = confirm("Yakin mau simpan perubahan?");
+      // Ini nomor 7 dari TO DO!
       if (r) {
         this.isLoading = true;
         let formdata = new FormData();
@@ -298,7 +309,7 @@ export default {
   }
 }
 
-@media (max-width: 576px) {
+@media (max-width: 576px) {PATCH
   .card-text-size {
     font-size: 0.9rem;
   }
