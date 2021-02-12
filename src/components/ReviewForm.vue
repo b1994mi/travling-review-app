@@ -63,14 +63,6 @@
 
 <script>
 import ImageInput from "./ImageInput";
-/*
-
-Todo: 
-5. Review form pake komponen image selector juga
-6. Review form juga pake card-text-size spy kecil pas mobile
-7. buttonnya juga btn-responsive
-
-*/
 import Rating from "./Rating";
 export default {
   data() {
@@ -82,6 +74,7 @@ export default {
       isLoading: false,
       keyRating: false,
       keyImgInput: false,
+      mainFetchURL: "https://secure-mountain-83151.herokuapp.com/api/v1/review",
     };
   },
   emits: ["suksesTambah"],
@@ -112,7 +105,7 @@ export default {
           formdata.append("images", item, item.name);
         });
         this.isLoading = true;
-        fetch("http://localhost:5050/api/v1/review", {
+        fetch(this.mainFetchURL, {
           method: "POST",
           body: formdata,
         })

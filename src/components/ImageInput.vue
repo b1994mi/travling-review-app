@@ -87,7 +87,7 @@ export default {
       this.$refs.file.value = "";
     },
     urlizer(img) {
-      return img instanceof Blob ? URL.createObjectURL(img) : img;
+      return URL.createObjectURL(img);
     },
     deleteImage(img) {
       this.images_files = this.images_files.filter((item) => item != img);

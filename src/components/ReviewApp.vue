@@ -6,7 +6,10 @@
   <div
     :class="[isLoading ? 'd-none' : 'd-flex', 'mt-3 justify-content-center']"
   >
-    <button @click="getReviews" class="btn btn-outline-primary btn-responsive d-flex align-items-center">
+    <button
+      @click="getReviews"
+      class="btn btn-outline-primary btn-responsive d-flex align-items-center"
+    >
       <refresh-icon />
       <span class="ms-2">Refresh</span>
     </button>
@@ -22,14 +25,14 @@
     <div v-else>
       <review-card
         v-for="review in reviews"
-        :key="review._id"
-        :id="review._id"
+        :key="review.id"
+        :id="review.id"
         :comment="review.review_comment"
         :name="review.name"
-        :date-created="review.created_at"
-        :updated-at="review.updated_at"
+        :created-at="review.createdAt"
+        :updated-at="review.updatedAt"
         :stars="review.review_star"
-        :images="review.image"
+        :images="review.Images"
         @suksesHapus="removeReviewFromArr"
       />
     </div>
@@ -47,6 +50,7 @@ export default {
       showRefresh: false,
       reviews: [],
       isLoading: true,
+      mainFetchURL: "https://secure-mountain-83151.herokuapp.com/api/v1/review",
     };
   },
   components: {
@@ -54,36 +58,56 @@ export default {
     ReviewCard,
     RefreshIcon,
   },
-  mounted() {
+  created() {
     this.getReviews();
   },
   methods: {
-    getReviews() {
-      this.isLoading = true;
-      fetch("http://localhost:5050/api/v1/review")
-        .then((response) => response.json())
-        .then((result) => {
-          this.reviews = [...result.data.reverse()];
-          this.isLoading = false;
-        })
-        .catch((error) => {
-          window.alert(error);
-          this.isLoading = false;
-        });
+    async getReviews() {
+      try {
+        this.isLoading = true;
+        const response = await fetch(this.mainFetchURL);
+        const { status, message, data } = await response.json();
+        if (status !== 200) throw message;
+        let r = this.reviewImagesToFile(data);
+        this.reviews = r.sort((a, b) => b.id - a.id);
+        this.isLoading = false;
+      } catch (error) {
+        window.alert(error);
+        this.isLoading = false;
+      }
     },
-    pushReviewToArr(object) {
-      fetch(
-        `http://localhost:5050/api/v1/review/${object.data.id}`
-      )
-        .then((response) => response.json())
-        .then((result) => (this.reviews = [result.data, ...this.reviews]))
-        .catch((error) => {
-          window.alert(error);
-          this.isLoading = false;
-        });
+    async pushReviewToArr({ data: { id } }) {
+      try {
+        // Mungkin suatu saat bisa ditambah card skeleton dulu sembari
+        // menunggu response dr server supaya terasa loadingnya oleh user.
+        const response = await fetch(`${this.mainFetchURL}/${id}`);
+        const { status, message, data } = await response.json();
+        if (status !== 200) throw message;
+        let r = data;
+        r.Images.length > 0 &&
+          (r.Images = r.Images.map((i) => this.imgToFile(i)));
+        this.reviews = [r, ...this.reviews];
+      } catch (error) {
+        window.alert(error);
+      }
     },
-    removeReviewFromArr(object) {
-      this.reviews = this.reviews.filter((el) => el._id != object.data.id);
+    removeReviewFromArr(id) {
+      this.reviews = this.reviews.filter((el) => el.id != id);
+    },
+    reviewImagesToFile(review) {
+      return review.map((review) => {
+        if (review.Images.length > 0) {
+          review.Images = review.Images.map((img) => {
+            return this.imgToFile(img);
+          });
+        }
+        return review;
+      });
+    },
+    imgToFile({ buffer: { data }, originalname, id }) {
+      let f = new File([new Uint8Array(data)], originalname);
+      f.id = id;
+      return f;
     },
   },
 };

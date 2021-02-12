@@ -14,8 +14,8 @@
             />
           </div>
           <p v-else class="fw-bold m-0">{{ name_toBeShown }}</p>
-          <p class="fw-light m-0">{{ formatTgl(dateCreated) }}</p>
-          <p v-if="dateCreated !== updatedAt_toBeShown" class="fw-light m-0">
+          <p class="fw-light m-0">{{ formatTgl(createdAt) }}</p>
+          <p v-if="createdAt !== updatedAt_toBeShown" class="fw-light m-0">
             Edited: {{ formatTgl(updatedAt_toBeShown) }}
           </p>
           <div v-if="isEditMode" class="my-2">
@@ -87,7 +87,7 @@
             <img
               class="w-100"
               :src="urlizer(image)"
-              :alt="image.originalName"
+              :alt="image.originalname"
             />
           </div>
         </div>
@@ -112,15 +112,7 @@ export default {
     Rating,
     ImageInput,
   },
-  props: [
-    "id",
-    "comment",
-    "name",
-    "dateCreated",
-    "updatedAt",
-    "stars",
-    "images",
-  ],
+  props: ["id", "comment", "name", "createdAt", "updatedAt", "stars", "images"],
   emits: ["suksesHapus"],
   data() {
     return {
@@ -134,10 +126,11 @@ export default {
       name_toBeEdited: this.name,
       comment_toBeEdited: this.comment,
       stars_toBeEdited: this.stars,
-      images_toBeEdited: this.imagesToBlobs(this.images),
+      images_toBeEdited: this.images,
       picURL:
         "https://abs.twimg.com/sticky/default_profile_images/default_profile_400x400.png", // Suatu saat ini bisa diganti prop
       picName: "twitter-egg-icon.jpg",
+      mainFetchURL: "https://secure-mountain-83151.herokuapp.com/api/v1/review",
     };
   },
   methods: {
@@ -155,13 +148,13 @@ export default {
       let r = confirm("Yakin mau hapus?");
       if (r) {
         let details = event.target.parentElement.parentElement;
-        fetch(`http://localhost:5050/api/v1/review/${this.id}`, {
+        fetch(`${this.mainFetchURL}/${this.id}`, {
           method: "delete",
         })
           .then((response) => response.json())
           .then((result) => {
             details.open = false;
-            this.$emit("suksesHapus", result);
+            this.$emit("suksesHapus", this.id);
           })
           .catch((error) => {
             window.alert(error);
@@ -174,44 +167,75 @@ export default {
       details.open = false;
       this.isEditMode = true;
     },
-    fixUbahReview() {
-      if (!this.name_toBeEdited) {
-        return alert("Mohon isi nama Anda.");
-      }
-      if (!this.comment_toBeEdited) {
-        return alert("Mohon isi ulasan Anda.");
-      }
-      if (!this.stars_toBeEdited) {
-        return alert("Mohon isi jumlah bintang Anda.");
-      }
+    async fixUbahReview() {
+      if (!this.name_toBeEdited) return alert("Mohon isi nama Anda.");
+      if (!this.comment_toBeEdited) return alert("Mohon isi ulasan Anda.");
+      if (!this.stars_toBeEdited) return alert("Isi jumlah bintang Anda.");
       let r = confirm("Yakin mau simpan perubahan?");
       if (r) {
         this.isLoading = true;
         let formdata = new FormData();
-        formdata.append("name", this.name_toBeEdited);
-        formdata.append("review_comment", this.comment_toBeEdited);
-        formdata.append("review_star", this.stars_toBeEdited);
-        this.images_toBeEdited.forEach((item) => {
-          formdata.append("images", item, item.name);
+        this.name_toBeEdited !== this.name_toBeShown &&
+          formdata.append("name", this.name_toBeEdited);
+        this.comment_toBeEdited !== this.comment_toBeShown &&
+          formdata.append("review_comment", this.comment_toBeEdited);
+        this.stars_toBeEdited !== this.stars_toBeShown &&
+          formdata.append("review_star", this.stars_toBeEdited);
+        this.images_toBeEdited.forEach((el) => {
+          const inc = this.images_toBeShown.includes(el);
+          // Kalo ada false, pasti itu tambah gambar.
+          if (!inc) formdata.append("images", el, el.name);
         });
-        fetch(`http://localhost:5050/api/v1/review/${this.id}`, {
-          method: "PATCH",
-          body: formdata,
-        })
-          .then((response) => response.json())
-          .then((result) => {
-            this.isLoading = false;
-            this.isEditMode = false;
-            this.name_toBeShown = this.name_toBeEdited;
-            this.comment_toBeShown = this.comment_toBeEdited;
-            this.stars_toBeShown = this.stars_toBeEdited;
-            this.images_toBeShown = this.images_toBeEdited;
-            this.updatedAt_toBeShown = new Date();
-          })
-          .catch((error) => {
-            window.alert(error);
-            this.isLoading = false;
+        this.images_toBeShown.forEach((el) => {
+          const inc = this.images_toBeEdited.includes(el);
+          // Kalo ada false, pasti itu hapus gambar.
+          if (!inc) formdata.append("images_toBeDeleted", el.id);
+        });
+        try {
+          const response = await fetch(`${this.mainFetchURL}/${this.id}`, {
+            method: "PATCH",
+            body: formdata,
           });
+          const { status, message, data } = await response.json();
+          if (status !== 200) throw message;
+          this.isLoading = this.isEditMode = false;
+          this.name_toBeShown = this.name_toBeEdited;
+          this.comment_toBeShown = this.comment_toBeEdited;
+          this.stars_toBeShown = this.stars_toBeEdited;
+          // START logic utk jk user mau upload gambar persis sama berkali2
+          // Hilangkan dulu property id di data.Images jk ada di toBeShown
+          for (let i = 0; i < data.Images.length; i++) {
+            const elm = data.Images[i];
+            for (let j = 0; j < this.images_toBeShown.length; j++) {
+              const el = this.images_toBeShown[j];
+              if (elm.id === el.id) {
+                delete elm.id;
+                break;
+              }
+            }
+          }
+          // baru kemudian cari images yang ditambah.
+          this.images_toBeEdited.forEach((el) => {
+            const inc = this.images_toBeShown.includes(el);
+            // Kalo ada false, pasti itu tambah gambar.
+            if (!inc) {
+              for (let i = 0; i < data.Images.length; i++) {
+                const elm = data.Images[i];
+                if (elm.originalname === el.name && elm.id) {
+                  el.id = elm.id;
+                  delete elm.id;
+                  break;
+                }
+              }
+            }
+          });
+          // END logic utk jk user mau upload gambar persis sama berkali2
+          this.images_toBeShown = this.images_toBeEdited;
+          this.updatedAt_toBeShown = new Date();
+        } catch (error) {
+          window.alert(error);
+          this.isLoading = false;
+        }
       }
     },
     batalUbahReview() {
@@ -224,9 +248,7 @@ export default {
       this.images_toBeEdited = arr;
     },
     urlizer(img) {
-      return img instanceof Blob
-        ? URL.createObjectURL(img)
-        : "data:image/jpeg;base64," + img.b64;
+      return URL.createObjectURL(img);
     },
     b64toBlob(b64Data, contentType = "", sliceSize = 512) {
       let byteCharacters = atob(b64Data);
@@ -248,7 +270,7 @@ export default {
       return images.map((image) => {
         let theBlob = this.b64toBlob(image.b64);
         theBlob.lastModifiedDate = new Date();
-        theBlob.name = image.originalName;
+        theBlob.name = image.originalname;
         return theBlob;
       });
     },
