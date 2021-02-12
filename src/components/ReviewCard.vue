@@ -101,11 +101,12 @@
  * TODO:
  * 1. hapus function yang tidak digunakan
  * 2. potong2 fix ubah review menjadi function2 yang lbh mudah dibaca
- * 3. buat form data ada pergantian di rating star supaya ada terpicu utk ubah updatedAt
+ * 🗸 3. buat form data ada pergantian di rating star supaya ada terpicu utk ubah updatedAt
  * 4. hapusReview() dibuat async aja
  * 5. deploy pake teknik gh-pages aja
  * 6. pakai plugin sejenis sweet alert tp lbh ringan
  * 7. puter if(!r) lempar execption aja spy indentasi berkurang
+ * 8. img thumbnail harus bisa full kotak walau landscape ratio
  */
 import DisplayPic from "./DisplayPic";
 import ImageInput from "./ImageInput";
@@ -190,8 +191,7 @@ export default {
           formdata.append("name", this.name_toBeEdited);
         this.comment_toBeEdited !== this.comment_toBeShown &&
           formdata.append("review_comment", this.comment_toBeEdited);
-        this.stars_toBeEdited !== this.stars_toBeShown &&
-          formdata.append("review_star", this.stars_toBeEdited);
+        formdata.append("review_star", this.stars_toBeEdited);
         this.images_toBeEdited.forEach((el) => {
           const inc = this.images_toBeShown.includes(el);
           // Kalo ada false, pasti itu tambah gambar.
@@ -309,8 +309,8 @@ export default {
   }
 }
 
-@media (max-width: 576px) {PATCH
-  .card-text-size {
+@media (max-width: 576px) {
+  PATCH .card-text-size {
     font-size: 0.9rem;
   }
   .btn-responsive {
