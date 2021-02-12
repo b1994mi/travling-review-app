@@ -62,6 +62,11 @@
 </template>
 
 <script>
+/**
+ * TO DO:
+ * 1. ifs throw error dibuat jadi satu line
+ * 2. async method spy kurang indentasinya
+ */
 import ImageInput from "./ImageInput";
 import Rating from "./Rating";
 export default {
