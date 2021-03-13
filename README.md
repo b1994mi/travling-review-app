@@ -1,5 +1,8 @@
 # travling-review-app
 
+## Back-End REST API
+This project consumes [REST API](https://github.com/b1994mi/travling-review-api) that is deployed on Heroku.
+
 ## Project setup
 ```
 npm install
