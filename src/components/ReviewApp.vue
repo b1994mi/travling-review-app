@@ -43,6 +43,7 @@
 import ReviewForm from "./ReviewForm";
 import ReviewCard from "./ReviewCard";
 import RefreshIcon from "./RefreshIcon.vue";
+import { mainFetchURL } from "@/const.js";
 export default {
   data() {
     return {
@@ -50,7 +51,6 @@ export default {
       showRefresh: false,
       reviews: [],
       isLoading: true,
-      mainFetchURL: "https://secure-mountain-83151.herokuapp.com/api/v1/review",
     };
   },
   components: {
@@ -65,7 +65,7 @@ export default {
     async getReviews() {
       try {
         this.isLoading = true;
-        const response = await fetch(this.mainFetchURL);
+        const response = await fetch(mainFetchURL);
         const { status, message, data } = await response.json();
         if (status !== 200) throw message;
         let r = this.reviewImagesToFile(data);
@@ -80,7 +80,7 @@ export default {
       try {
         // Mungkin suatu saat bisa ditambah card skeleton dulu sembari
         // menunggu response dr server supaya terasa loadingnya oleh user.
-        const response = await fetch(`${this.mainFetchURL}/${id}`);
+        const response = await fetch(`${mainFetchURL}/${id}`);
         const { status, message, data } = await response.json();
         if (status !== 200) throw message;
         let r = data;

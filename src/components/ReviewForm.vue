@@ -69,6 +69,7 @@
  */
 import ImageInput from "./ImageInput";
 import Rating from "./Rating";
+import { mainFetchURL } from "@/const.js";
 export default {
   data: () => ({
     nama: "",
@@ -78,7 +79,6 @@ export default {
     isLoading: false,
     keyRating: false,
     keyImgInput: false,
-    mainFetchURL: "https://secure-mountain-83151.herokuapp.com/api/v1/review",
   }),
   emits: ["suksesTambah"],
   methods: {
@@ -104,7 +104,7 @@ export default {
       });
       this.isLoading = true;
       try {
-        const response = await fetch(this.mainFetchURL, {
+        const response = await fetch(mainFetchURL, {
           method: "POST",
           body: formdata,
         });

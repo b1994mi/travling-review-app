@@ -102,6 +102,7 @@
  * 6. pakai plugin sejenis sweet alert tp lbh ringan
  * 🗸 7. puter if(!r) lempar execption aja spy indentasi berkurang
  * 🗸 8. img thumbnail harus bisa full kotak walau landscape ratio
+ * 9. urlizer(img) dibuat jadi mixin saja, dan coba cari func lain yg bisa dijdkan mixin
  */
 import DisplayPic from "./DisplayPic";
 import ImageInput from "./ImageInput";
@@ -109,6 +110,7 @@ import Rating from "./Rating";
 import StarsFilled from "./StarsFilled";
 import StarsHollow from "./StarsHollow";
 import ThreeDots from "./ThreeDots";
+import { mainFetchURL } from "@/const.js";
 export default {
   components: {
     StarsFilled,
@@ -136,7 +138,6 @@ export default {
       picURL:
         "https://abs.twimg.com/sticky/default_profile_images/default_profile_400x400.png", // Suatu saat ini bisa diganti prop
       picName: "twitter-egg-icon.jpg",
-      mainFetchURL: "https://secure-mountain-83151.herokuapp.com/api/v1/review",
     };
   },
   methods: {
@@ -155,7 +156,7 @@ export default {
       if (!r) return;
       let details = event.target.parentElement.parentElement;
       try {
-        await fetch(`${this.mainFetchURL}/${this.id}`, {
+        await fetch(`${mainFetchURL}/${this.id}`, {
           method: "delete",
         });
         details.open = false;
@@ -194,7 +195,7 @@ export default {
         if (!inc) formdata.append("images_toBeDeleted", el.id);
       });
       try {
-        const response = await fetch(`${this.mainFetchURL}/${this.id}`, {
+        const response = await fetch(`${mainFetchURL}/${this.id}`, {
           method: "PATCH",
           body: formdata,
         });
