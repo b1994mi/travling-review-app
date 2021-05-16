@@ -104,6 +104,7 @@
  * 🗸 8. img thumbnail harus bisa full kotak walau landscape ratio
  * 9. urlizer(img) dibuat jadi mixin saja, dan coba cari func lain yg bisa dijdkan mixin
  * 10. ketika POST awal di reviewform dan reviwapp, ada loading ketika akan push card
+ * 11. gambar di card bisa di-click seperti twitter/ review di shopee
  */
 import DisplayPic from "./DisplayPic";
 import ImageInput from "./ImageInput";
