@@ -94,13 +94,13 @@
 <script>
 /**
  * TODO:
- * 1. hapus function yang tidak digunakan
+ * 🗸 1. hapus function yang tidak digunakan
  * 2. potong2 fix ubah review menjadi function2 yang lbh mudah dibaca
  * 🗸 3. buat form data ada pergantian di rating star supaya ada terpicu utk ubah updatedAt
- * 4. hapusReview() dibuat async aja
+ * 🗸 4. hapusReview() dibuat async aja
  * 🗸 5. deploy pake teknik gh-pages aja
  * 6. pakai plugin sejenis sweet alert tp lbh ringan
- * 7. puter if(!r) lempar execption aja spy indentasi berkurang
+ * 🗸 7. puter if(!r) lempar execption aja spy indentasi berkurang
  * 🗸 8. img thumbnail harus bisa full kotak walau landscape ratio
  */
 import DisplayPic from "./DisplayPic";
@@ -150,22 +150,19 @@ export default {
         minute: "2-digit",
       });
     },
-    hapusReview(event) {
+    async hapusReview(event) {
       let r = confirm("Yakin mau hapus?");
-      if (r) {
-        let details = event.target.parentElement.parentElement;
-        fetch(`${this.mainFetchURL}/${this.id}`, {
+      if (!r) return;
+      let details = event.target.parentElement.parentElement;
+      try {
+        await fetch(`${this.mainFetchURL}/${this.id}`, {
           method: "delete",
-        })
-          .then((response) => response.json())
-          .then((result) => {
-            details.open = false;
-            this.$emit("suksesHapus", this.id);
-          })
-          .catch((error) => {
-            window.alert(error);
-            this.isLoading = false;
-          });
+        });
+        details.open = false;
+        this.$emit("suksesHapus", this.id);
+      } catch (error) {
+        window.alert(error);
+        this.isLoading = false;
       }
     },
     ubahReview(event) {
@@ -178,70 +175,68 @@ export default {
       if (!this.comment_toBeEdited) return alert("Mohon isi ulasan Anda.");
       if (!this.stars_toBeEdited) return alert("Isi jumlah bintang Anda.");
       let r = confirm("Yakin mau simpan perubahan?");
-      // Ini nomor 7 dari TO DO!
-      if (r) {
-        this.isLoading = true;
-        let formdata = new FormData();
-        this.name_toBeEdited !== this.name_toBeShown &&
-          formdata.append("name", this.name_toBeEdited);
-        this.comment_toBeEdited !== this.comment_toBeShown &&
-          formdata.append("review_comment", this.comment_toBeEdited);
-        formdata.append("review_star", this.stars_toBeEdited);
+      if (!r) return;
+      this.isLoading = true;
+      let formdata = new FormData();
+      this.name_toBeEdited !== this.name_toBeShown &&
+        formdata.append("name", this.name_toBeEdited);
+      this.comment_toBeEdited !== this.comment_toBeShown &&
+        formdata.append("review_comment", this.comment_toBeEdited);
+      formdata.append("review_star", this.stars_toBeEdited);
+      this.images_toBeEdited.forEach((el) => {
+        const inc = this.images_toBeShown.includes(el);
+        // Kalo ada false, pasti itu tambah gambar.
+        if (!inc) formdata.append("images", el, el.name);
+      });
+      this.images_toBeShown.forEach((el) => {
+        const inc = this.images_toBeEdited.includes(el);
+        // Kalo ada false, pasti itu hapus gambar.
+        if (!inc) formdata.append("images_toBeDeleted", el.id);
+      });
+      try {
+        const response = await fetch(`${this.mainFetchURL}/${this.id}`, {
+          method: "PATCH",
+          body: formdata,
+        });
+        const { status, message, data } = await response.json();
+        if (status !== 200) throw message;
+        this.isLoading = this.isEditMode = false;
+        this.name_toBeShown = this.name_toBeEdited;
+        this.comment_toBeShown = this.comment_toBeEdited;
+        this.stars_toBeShown = this.stars_toBeEdited;
+        // START logic utk jk user mau upload gambar persis sama berkali2
+        // Hilangkan dulu property id di data.Images jk ada di toBeShown
+        for (let i = 0; i < data.Images.length; i++) {
+          const elm = data.Images[i];
+          for (let j = 0; j < this.images_toBeShown.length; j++) {
+            const el = this.images_toBeShown[j];
+            if (elm.id === el.id) {
+              delete elm.id;
+              break;
+            }
+          }
+        }
+        // baru kemudian cari images yang ditambah.
         this.images_toBeEdited.forEach((el) => {
           const inc = this.images_toBeShown.includes(el);
           // Kalo ada false, pasti itu tambah gambar.
-          if (!inc) formdata.append("images", el, el.name);
-        });
-        this.images_toBeShown.forEach((el) => {
-          const inc = this.images_toBeEdited.includes(el);
-          // Kalo ada false, pasti itu hapus gambar.
-          if (!inc) formdata.append("images_toBeDeleted", el.id);
-        });
-        try {
-          const response = await fetch(`${this.mainFetchURL}/${this.id}`, {
-            method: "PATCH",
-            body: formdata,
-          });
-          const { status, message, data } = await response.json();
-          if (status !== 200) throw message;
-          this.isLoading = this.isEditMode = false;
-          this.name_toBeShown = this.name_toBeEdited;
-          this.comment_toBeShown = this.comment_toBeEdited;
-          this.stars_toBeShown = this.stars_toBeEdited;
-          // START logic utk jk user mau upload gambar persis sama berkali2
-          // Hilangkan dulu property id di data.Images jk ada di toBeShown
-          for (let i = 0; i < data.Images.length; i++) {
-            const elm = data.Images[i];
-            for (let j = 0; j < this.images_toBeShown.length; j++) {
-              const el = this.images_toBeShown[j];
-              if (elm.id === el.id) {
+          if (!inc) {
+            for (let i = 0; i < data.Images.length; i++) {
+              const elm = data.Images[i];
+              if (elm.originalname === el.name && elm.id) {
+                el.id = elm.id;
                 delete elm.id;
                 break;
               }
             }
           }
-          // baru kemudian cari images yang ditambah.
-          this.images_toBeEdited.forEach((el) => {
-            const inc = this.images_toBeShown.includes(el);
-            // Kalo ada false, pasti itu tambah gambar.
-            if (!inc) {
-              for (let i = 0; i < data.Images.length; i++) {
-                const elm = data.Images[i];
-                if (elm.originalname === el.name && elm.id) {
-                  el.id = elm.id;
-                  delete elm.id;
-                  break;
-                }
-              }
-            }
-          });
-          // END logic utk jk user mau upload gambar persis sama berkali2
-          this.images_toBeShown = this.images_toBeEdited;
-          this.updatedAt_toBeShown = new Date();
-        } catch (error) {
-          window.alert(error);
-          this.isLoading = false;
-        }
+        });
+        // END logic utk jk user mau upload gambar persis sama berkali2
+        this.images_toBeShown = this.images_toBeEdited;
+        this.updatedAt_toBeShown = new Date();
+      } catch (error) {
+        window.alert(error);
+        this.isLoading = false;
       }
     },
     batalUbahReview() {
@@ -255,30 +250,6 @@ export default {
     },
     urlizer(img) {
       return URL.createObjectURL(img);
-    },
-    b64toBlob(b64Data, contentType = "", sliceSize = 512) {
-      let byteCharacters = atob(b64Data);
-      let byteArrays = [];
-      let bcl = byteCharacters.length;
-      for (let offset = 0; offset < bcl; offset += sliceSize) {
-        let slice = byteCharacters.slice(offset, offset + sliceSize);
-        let byteNumbers = new Array(slice.length);
-        for (let i = 0; i < slice.length; i++) {
-          byteNumbers[i] = slice.charCodeAt(i);
-        }
-        let byteArray = new Uint8Array(byteNumbers);
-        byteArrays.push(byteArray);
-      }
-      let blob = new Blob(byteArrays, { type: contentType });
-      return blob;
-    },
-    imagesToBlobs(images = []) {
-      return images.map((image) => {
-        let theBlob = this.b64toBlob(image.b64);
-        theBlob.lastModifiedDate = new Date();
-        theBlob.name = image.originalname;
-        return theBlob;
-      });
     },
   },
 };
