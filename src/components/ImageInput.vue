@@ -53,7 +53,10 @@
           />
         </svg>
       </button>
-      <img :src="urlizer(img)" class="w-100" />
+      <div
+        class="mt-2 me-3 rounded-3 image-size"
+        :style="'background-image: url(' + urlizer(img) + ')'"
+      ></div>
     </div>
   </div>
 </template>

@@ -80,16 +80,11 @@
         <p class="isi-review m-0 mb-1 text-break">{{ comment_toBeShown }}</p>
         <div v-if="images_toBeShown.length > 0" class="d-flex flex-wrap">
           <div
-            class="overflow-hidden mt-2 me-3 rounded-3 d-flex align-items-center image-size"
+            :style="'background-image: url(' + urlizer(image) + ')'"
+            class="mt-2 me-3 rounded-3 image-size"
             v-for="image in images_toBeShown"
             :key="image"
-          >
-            <img
-              class="w-100"
-              :src="urlizer(image)"
-              :alt="image.originalname"
-            />
-          </div>
+          ></div>
         </div>
       </div>
     </div>
@@ -103,10 +98,10 @@
  * 2. potong2 fix ubah review menjadi function2 yang lbh mudah dibaca
  * 🗸 3. buat form data ada pergantian di rating star supaya ada terpicu utk ubah updatedAt
  * 4. hapusReview() dibuat async aja
- * 5. deploy pake teknik gh-pages aja
+ * 🗸 5. deploy pake teknik gh-pages aja
  * 6. pakai plugin sejenis sweet alert tp lbh ringan
  * 7. puter if(!r) lempar execption aja spy indentasi berkurang
- * 8. img thumbnail harus bisa full kotak walau landscape ratio
+ * 🗸 8. img thumbnail harus bisa full kotak walau landscape ratio
  */
 import DisplayPic from "./DisplayPic";
 import ImageInput from "./ImageInput";
@@ -293,6 +288,16 @@ export default {
 .image-size {
   width: 60px;
   height: 60px;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  overflow: hidden;
+}
+
+.image-size img {
+  min-height: 100%;
+  min-width: 100%;
+  opacity: 0;
 }
 
 @media (min-width: 310px) {
