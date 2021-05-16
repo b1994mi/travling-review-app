@@ -103,6 +103,7 @@
  * 🗸 7. puter if(!r) lempar execption aja spy indentasi berkurang
  * 🗸 8. img thumbnail harus bisa full kotak walau landscape ratio
  * 9. urlizer(img) dibuat jadi mixin saja, dan coba cari func lain yg bisa dijdkan mixin
+ * 10. ketika POST awal di reviewform dan reviwapp, ada loading ketika akan push card
  */
 import DisplayPic from "./DisplayPic";
 import ImageInput from "./ImageInput";
