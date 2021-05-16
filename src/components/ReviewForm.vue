@@ -70,18 +70,16 @@
 import ImageInput from "./ImageInput";
 import Rating from "./Rating";
 export default {
-  data() {
-    return {
-      nama: "",
-      review: "",
-      bintang: "",
-      gambar: [],
-      isLoading: false,
-      keyRating: false,
-      keyImgInput: false,
-      mainFetchURL: "https://secure-mountain-83151.herokuapp.com/api/v1/review",
-    };
-  },
+  data: () => ({
+    nama: "",
+    review: "",
+    bintang: "",
+    gambar: [],
+    isLoading: false,
+    keyRating: false,
+    keyImgInput: false,
+    mainFetchURL: "https://secure-mountain-83151.herokuapp.com/api/v1/review",
+  }),
   emits: ["suksesTambah"],
   methods: {
     getStars(s) {
@@ -90,45 +88,38 @@ export default {
     setImgs(arr) {
       this.gambar = arr;
     },
-    handleSubmit(event) {
+    async handleSubmit() {
       if (!this.nama || !this.review || !this.bintang) {
-        if (!this.nama) {
-          window.alert("mohon lengkapi nama!");
-        }
-        if (!this.review) {
-          window.alert("mohon lengkapi isi ulasan Anda!");
-        }
-        if (!this.bintang) {
-          window.alert("mohon lengkapi rating bintang Anda!");
-        }
-      } else {
-        let formdata = new FormData();
-        formdata.append("name", this.nama);
-        formdata.append("review_comment", this.review);
-        formdata.append("review_star", this.bintang);
-        this.gambar.forEach((item) => {
-          formdata.append("images", item, item.name);
-        });
-        this.isLoading = true;
-        fetch(this.mainFetchURL, {
+        if (!this.nama) window.alert("mohon lengkapi nama!");
+        if (!this.review) window.alert("mohon lengkapi isi ulasan Anda!");
+        if (!this.bintang) window.alert("mohon lengkapi rating bintang Anda!");
+        return;
+      }
+      let formdata = new FormData();
+      formdata.append("name", this.nama);
+      formdata.append("review_comment", this.review);
+      formdata.append("review_star", this.bintang);
+      this.gambar.forEach((item) => {
+        formdata.append("images", item, item.name);
+      });
+      this.isLoading = true;
+      try {
+        const response = await fetch(this.mainFetchURL, {
           method: "POST",
           body: formdata,
-        })
-          .then((response) => response.json())
-          .then((result) => {
-            this.$emit("suksesTambah", result);
-            this.isLoading = false;
-            this.nama = "";
-            this.review = "";
-            this.bintang = "";
-            this.gambar = [];
-            this.keyRating = !this.keyRating;
-            this.keyImgInput = !this.keyImgInput;
-          })
-          .catch((error) => {
-            window.alert(error);
-            this.isLoading = false;
-          });
+        });
+        const result = await response.json();
+        this.$emit("suksesTambah", result);
+        this.isLoading = false;
+        this.nama = "";
+        this.review = "";
+        this.bintang = "";
+        this.gambar = [];
+        this.keyRating = !this.keyRating;
+        this.keyImgInput = !this.keyImgInput;
+      } catch (error) {
+        window.alert(error);
+        this.isLoading = false;
       }
     },
   },
