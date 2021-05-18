@@ -98,15 +98,15 @@
 /**
  * TODO:
  * 🗸 1. hapus function yang tidak digunakan
- * 2. potong2 fix ubah review menjadi function2 yang lbh mudah dibaca
+ * 🗸 2. potong2 fix ubah review menjadi function2 yang lbh mudah dibaca
  * 🗸 3. buat form data ada pergantian di rating star supaya ada terpicu utk ubah updatedAt
  * 🗸 4. hapusReview() dibuat async aja
  * 🗸 5. deploy pake teknik gh-pages aja
- * 6. pakai plugin sejenis sweet alert tp lbh ringan
+ * x 6. pakai plugin sejenis sweet alert tp lbh ringan
  * 🗸 7. puter if(!r) lempar execption aja spy indentasi berkurang
  * 🗸 8. img thumbnail harus bisa full kotak walau landscape ratio
  * 9. urlizer(img) dibuat jadi mixin saja, dan coba cari func lain yg bisa dijdkan mixin
- * 10. ketika POST awal di reviewform dan reviwapp, ada loading ketika akan push card
+ * 🗸 10. ketika POST awal di reviewform dan reviwapp, ada loading ketika akan push card
  * 11. gambar di card bisa di-click seperti twitter/ review di shopee
  */
 import DisplayPic from "./DisplayPic";
@@ -185,22 +185,7 @@ export default {
       let r = confirm("Yakin mau simpan perubahan?");
       if (!r) return;
       this.isLoading = true;
-      let formdata = new FormData();
-      this.name_toBeEdited !== this.name_toBeShown &&
-        formdata.append("name", this.name_toBeEdited);
-      this.comment_toBeEdited !== this.comment_toBeShown &&
-        formdata.append("review_comment", this.comment_toBeEdited);
-      formdata.append("review_star", this.stars_toBeEdited);
-      this.images_toBeEdited.forEach((el) => {
-        const inc = this.images_toBeShown.includes(el);
-        // Kalo ada false, pasti itu tambah gambar.
-        if (!inc) formdata.append("images", el, el.name);
-      });
-      this.images_toBeShown.forEach((el) => {
-        const inc = this.images_toBeEdited.includes(el);
-        // Kalo ada false, pasti itu hapus gambar.
-        if (!inc) formdata.append("images_toBeDeleted", el.id);
-      });
+      const formdata = this.generateFormdata();
       try {
         const response = await fetch(`${mainFetchURL}/${this.id}`, {
           method: "PATCH",
@@ -226,9 +211,9 @@ export default {
         }
         // baru kemudian cari images yang ditambah.
         this.images_toBeEdited.forEach((el) => {
-          const inc = this.images_toBeShown.includes(el);
+          const isIncluded = this.images_toBeShown.includes(el);
           // Kalo ada false, pasti itu tambah gambar.
-          if (!inc) {
+          if (!isIncluded) {
             for (let i = 0; i < data.Images.length; i++) {
               const elm = data.Images[i];
               if (elm.originalname === el.name && elm.id) {
@@ -258,6 +243,33 @@ export default {
     },
     urlizer(img) {
       return URL.createObjectURL(img);
+    },
+    generateFormdata() {
+      let formdata = new FormData();
+
+      const isNameChanged = this.name_toBeEdited !== this.name_toBeShown;
+      const isCommentChanged =
+        this.comment_toBeEdited !== this.comment_toBeShown;
+
+      if (isNameChanged) formdata.append("name", this.name_toBeEdited);
+      if (isCommentChanged)
+        formdata.append("review_comment", this.comment_toBeEdited);
+
+      formdata.append("review_star", this.stars_toBeEdited);
+
+      this.images_toBeEdited.forEach((el) => {
+        const isIncluded = this.images_toBeShown.includes(el);
+        // Kalo ada false, pasti itu tambah gambar.
+        if (!isIncluded) formdata.append("images", el, el.name);
+      });
+
+      this.images_toBeShown.forEach((el) => {
+        const isIncluded = this.images_toBeEdited.includes(el);
+        // Kalo ada false, pasti itu hapus gambar.
+        if (!isIncluded) formdata.append("images_toBeDeleted", el.id);
+      });
+
+      return formdata;
     },
   },
 };
