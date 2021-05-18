@@ -80,17 +80,23 @@
         </div>
         <div v-else class="d-flex flex-column">
           <p class="isi-review m-0 mb-1 text-break">{{ comment_toBeShown }}</p>
-          <div v-if="images_toBeShown.length > 0" class="d-flex flex-wrap">
+          <div
+            v-if="images_toBeShown.length > 0"
+            class="d-flex flex-wrap"
+            style="cursor: pointer"
+          >
             <div
               :style="'background-image: url(' + urlizer(image) + ')'"
               class="mt-2 me-3 rounded-3 image-size"
               v-for="image in images_toBeShown"
+              @click="showModal(urlizer(image))"
               :key="image"
             ></div>
           </div>
         </div>
       </div>
     </div>
+    <modal-container v-if="modal" @close="modal = false" :imgModal="imgModal"/>
   </div>
 </template>
 
@@ -107,7 +113,7 @@
  * 🗸 8. img thumbnail harus bisa full kotak walau landscape ratio
  * 🗸 9. urlizer(img) dibuat jadi mixin saja, dan coba cari func lain yg bisa dijdkan mixin
  * 🗸 10. ketika POST awal di reviewform dan reviwapp, ada loading ketika akan push card
- * 11. gambar di card bisa di-click seperti twitter/ review di shopee
+ * 🗸 11. gambar di card bisa di-click seperti twitter/ review di shopee
  */
 import DisplayPic from "./DisplayPic";
 import ImageInput from "./ImageInput";
@@ -117,6 +123,7 @@ import StarsHollow from "./StarsHollow";
 import ThreeDots from "./ThreeDots";
 import SkeletonCard from "./SkeletonCard";
 import mixins from "../mixins";
+import ModalContainer from "./ModalContainer";
 import { mainFetchURL } from "@/const.js";
 export default {
   components: {
@@ -127,6 +134,7 @@ export default {
     Rating,
     ImageInput,
     SkeletonCard,
+    ModalContainer,
   },
   props: ["id", "comment", "name", "createdAt", "updatedAt", "stars", "images"],
   emits: ["suksesHapus"],
@@ -146,6 +154,8 @@ export default {
       picURL:
         "https://abs.twimg.com/sticky/default_profile_images/default_profile_400x400.png", // Suatu saat ini bisa diganti prop
       picName: "twitter-egg-icon.jpg",
+      modal: false,
+      imgModal: "",
     };
   },
   mixins: [mixins],
@@ -269,6 +279,10 @@ export default {
       });
 
       return formdata;
+    },
+    showModal(imgUrl) {
+      this.imgModal = imgUrl;
+      this.modal = true;
     },
   },
 };
