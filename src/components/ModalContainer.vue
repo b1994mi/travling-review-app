@@ -1,6 +1,6 @@
 <template>
   <div class="modal-mask" @click.self="$emit('close')">
-    <div class="justify-content-center align-items-center modal-container">
+    <div class="modal-container" @click.self="$emit('close')">
       <div
         class="image-container position-relative"
         :style="'background-image: url(' + imgModal + ')'"
@@ -52,6 +52,8 @@ export default {
 .modal-container {
   display: flex;
   flex: 1 0 90%;
+  justify-content: center;
+  align-items: center;
   z-index: 2;
 }
 
