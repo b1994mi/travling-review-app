@@ -78,10 +78,18 @@ export default {
     },
     async pushReviewToArr({ data: { id } }) {
       try {
-        // Mungkin suatu saat bisa ditambah card skeleton dulu sembari
-        // menunggu response dr server supaya terasa loadingnya oleh user.
+        this.reviews.unshift({
+          id: 0,
+          name: "Loading...",
+          review_comment: "Loading...",
+          review_star: 0,
+          createdAt: "",
+          updatedAt: "",
+          Images: [],
+        });
         const response = await fetch(`${mainFetchURL}/${id}`);
         const { status, message, data } = await response.json();
+        this.reviews.shift();
         if (status !== 200) throw message;
         let r = data;
         r.Images.length > 0 &&

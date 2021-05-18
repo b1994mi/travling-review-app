@@ -1,90 +1,93 @@
 <template>
-  <div class="card flex-row bg-light mb-2 p-3 rounded shadow-sm card-text-size">
-    <display-pic :picURL="picURL" :picName="picName" />
-    <div class="d-flex flex-wrap w-100">
-      <div class="d-flex justify-content-between w-100">
-        <div class="d-flex flex-column w-100">
-          <div v-if="isEditMode" class="d-flex flex-wrap">
-            <input
-              type="text"
-              class="flex-grow-1"
-              placeholder="Your Name..."
-              v-model="name_toBeEdited"
-              :disabled="isLoading"
-            />
+  <div class="card bg-light mb-2 p-3 rounded shadow-sm card-text-size">
+    <skeleton-card v-if="id === 0 && stars === 0 && images.length === 0" />
+    <div v-else class="d-flex flex-row">
+      <display-pic :picURL="picURL" :picName="picName" />
+      <div class="d-flex flex-wrap w-100">
+        <div class="d-flex justify-content-between w-100">
+          <div class="d-flex flex-column w-100">
+            <div v-if="isEditMode" class="d-flex flex-wrap">
+              <input
+                type="text"
+                class="flex-grow-1"
+                placeholder="Your Name..."
+                v-model="name_toBeEdited"
+                :disabled="isLoading"
+              />
+            </div>
+            <p v-else class="fw-bold m-0">{{ name_toBeShown }}</p>
+            <p class="fw-light m-0">{{ formatTgl(createdAt) }}</p>
+            <p v-if="createdAt !== updatedAt_toBeShown" class="fw-light m-0">
+              Edited: {{ formatTgl(updatedAt_toBeShown) }}
+            </p>
+            <div v-if="isEditMode" class="my-2">
+              <rating
+                :grade="stars_toBeEdited"
+                :maxStars="5"
+                :hasCounter="false"
+                @update="setStars"
+              />
+            </div>
+            <p v-else class="m-0 mb-1">
+              <stars-filled v-for="n in stars_toBeShown" :key="n" />
+              <stars-hollow v-for="n in 5 - stars_toBeShown" :key="n" />
+            </p>
           </div>
-          <p v-else class="fw-bold m-0">{{ name_toBeShown }}</p>
-          <p class="fw-light m-0">{{ formatTgl(createdAt) }}</p>
-          <p v-if="createdAt !== updatedAt_toBeShown" class="fw-light m-0">
-            Edited: {{ formatTgl(updatedAt_toBeShown) }}
-          </p>
-          <div v-if="isEditMode" class="my-2">
-            <rating
-              :grade="stars_toBeEdited"
-              :maxStars="5"
-              :hasCounter="false"
-              @update="setStars"
-            />
-          </div>
-          <p v-else class="m-0 mb-1">
-            <stars-filled v-for="n in stars_toBeShown" :key="n" />
-            <stars-hollow v-for="n in 5 - stars_toBeShown" :key="n" />
-          </p>
+          <details v-if="!isEditMode" class="dropdown">
+            <summary role="button">
+              <a class="button">
+                <three-dots />
+              </a>
+            </summary>
+            <div class="bg-secondary bg-gradient px-3 py-1">
+              <a
+                @click="ubahReview"
+                class="btn btn-warning bg-gradient rounded-pill p-1 mb-1"
+                >Edit review</a
+              >
+              <a
+                @click="hapusReview"
+                class="btn btn-danger bg-gradient rounded-pill p-1"
+                >Delete review</a
+              >
+            </div>
+          </details>
         </div>
-        <details v-if="!isEditMode" class="dropdown">
-          <summary role="button">
-            <a class="button">
-              <three-dots />
-            </a>
-          </summary>
-          <div class="bg-secondary bg-gradient px-3 py-1">
-            <a
-              @click="ubahReview"
-              class="btn btn-warning bg-gradient rounded-pill p-1 mb-1"
-              >Edit review</a
+        <div v-if="isEditMode" class="w-100">
+          <textarea
+            v-model="comment_toBeEdited"
+            class="form-control my-2 align-self-stretch"
+            style="font-size: inherit !important; min-height: 8em"
+            placeholder="Your review here..."
+            :disabled="isLoading"
+          ></textarea>
+          <image-input :images="images_toBeEdited" @listImgChanges="setImgs">
+            <button
+              @click="batalUbahReview"
+              :disabled="isLoading"
+              class="btn btn-primary btn-responsive ms-sm-2"
             >
-            <a
-              @click="hapusReview"
-              class="btn btn-danger bg-gradient rounded-pill p-1"
-              >Delete review</a
+              Cancel
+            </button>
+            <button
+              @click="fixUbahReview"
+              :disabled="isLoading"
+              class="btn btn-outline-danger btn-responsive ms-2"
             >
+              Save
+            </button>
+          </image-input>
+        </div>
+        <div v-else class="d-flex flex-column">
+          <p class="isi-review m-0 mb-1 text-break">{{ comment_toBeShown }}</p>
+          <div v-if="images_toBeShown.length > 0" class="d-flex flex-wrap">
+            <div
+              :style="'background-image: url(' + urlizer(image) + ')'"
+              class="mt-2 me-3 rounded-3 image-size"
+              v-for="image in images_toBeShown"
+              :key="image"
+            ></div>
           </div>
-        </details>
-      </div>
-      <div v-if="isEditMode" class="w-100">
-        <textarea
-          v-model="comment_toBeEdited"
-          class="form-control my-2 align-self-stretch"
-          style="font-size: inherit !important; min-height: 8em"
-          placeholder="Your review here..."
-          :disabled="isLoading"
-        ></textarea>
-        <image-input :images="images_toBeEdited" @listImgChanges="setImgs">
-          <button
-            @click="batalUbahReview"
-            :disabled="isLoading"
-            class="btn btn-primary btn-responsive ms-sm-2"
-          >
-            Cancel
-          </button>
-          <button
-            @click="fixUbahReview"
-            :disabled="isLoading"
-            class="btn btn-outline-danger btn-responsive ms-2"
-          >
-            Save
-          </button>
-        </image-input>
-      </div>
-      <div v-else class="d-flex flex-column">
-        <p class="isi-review m-0 mb-1 text-break">{{ comment_toBeShown }}</p>
-        <div v-if="images_toBeShown.length > 0" class="d-flex flex-wrap">
-          <div
-            :style="'background-image: url(' + urlizer(image) + ')'"
-            class="mt-2 me-3 rounded-3 image-size"
-            v-for="image in images_toBeShown"
-            :key="image"
-          ></div>
         </div>
       </div>
     </div>
@@ -112,6 +115,7 @@ import Rating from "./Rating";
 import StarsFilled from "./StarsFilled";
 import StarsHollow from "./StarsHollow";
 import ThreeDots from "./ThreeDots";
+import SkeletonCard from "./SkeletonCard";
 import { mainFetchURL } from "@/const.js";
 export default {
   components: {
@@ -121,6 +125,7 @@ export default {
     DisplayPic,
     Rating,
     ImageInput,
+    SkeletonCard,
   },
   props: ["id", "comment", "name", "createdAt", "updatedAt", "stars", "images"],
   emits: ["suksesHapus"],
