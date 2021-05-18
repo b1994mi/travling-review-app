@@ -62,6 +62,7 @@
 </template>
 
 <script>
+import mixins from "../mixins";
 export default {
   name: "image-input",
   data() {
@@ -76,6 +77,7 @@ export default {
   },
   props: ["images"],
   emits: ["listImgChanges"],
+  mixins: [mixins],
   methods: {
     launchFilePicker() {
       this.$refs.file.click();
@@ -88,9 +90,6 @@ export default {
       this.images_files = tempArr;
       this.$emit("listImgChanges", this.images_files);
       this.$refs.file.value = "";
-    },
-    urlizer(img) {
-      return URL.createObjectURL(img);
     },
     deleteImage(img) {
       this.images_files = this.images_files.filter((item) => item != img);

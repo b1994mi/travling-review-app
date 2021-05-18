@@ -105,7 +105,7 @@
  * x 6. pakai plugin sejenis sweet alert tp lbh ringan
  * 🗸 7. puter if(!r) lempar execption aja spy indentasi berkurang
  * 🗸 8. img thumbnail harus bisa full kotak walau landscape ratio
- * 9. urlizer(img) dibuat jadi mixin saja, dan coba cari func lain yg bisa dijdkan mixin
+ * 🗸 9. urlizer(img) dibuat jadi mixin saja, dan coba cari func lain yg bisa dijdkan mixin
  * 🗸 10. ketika POST awal di reviewform dan reviwapp, ada loading ketika akan push card
  * 11. gambar di card bisa di-click seperti twitter/ review di shopee
  */
@@ -116,6 +116,7 @@ import StarsFilled from "./StarsFilled";
 import StarsHollow from "./StarsHollow";
 import ThreeDots from "./ThreeDots";
 import SkeletonCard from "./SkeletonCard";
+import mixins from "../mixins";
 import { mainFetchURL } from "@/const.js";
 export default {
   components: {
@@ -147,6 +148,7 @@ export default {
       picName: "twitter-egg-icon.jpg",
     };
   },
+  mixins: [mixins],
   methods: {
     formatTgl(tgl) {
       return new Date(tgl).toLocaleDateString("id-id", {
@@ -240,9 +242,6 @@ export default {
     },
     setImgs(arr) {
       this.images_toBeEdited = arr;
-    },
-    urlizer(img) {
-      return URL.createObjectURL(img);
     },
     generateFormdata() {
       let formdata = new FormData();
