@@ -1,2 +1,2 @@
-export const mainFetchURL = "https://secure-mountain-83151.herokuapp.com/api/v1/review"
-// Testing apa masih bisa push ke github
+export const mainFetchURL = ""
+// As of 26 Aug 2022, I have decided to close down heroku deployment because heroku free dyno is shutting down at 28 November 2022
